@@ -1,7 +1,6 @@
 package com.project.productservicefakestore.services;
 
-import com.project.productservicefakestore.dtos.FakeStoreAllProductsDto;
-import com.project.productservicefakestore.dtos.FakeStoreProductDto;
+import com.project.productservicefakestore.dtos.ProductDto;
 import com.project.productservicefakestore.models.Category;
 import com.project.productservicefakestore.models.Product;
 import org.springframework.stereotype.Service;
@@ -17,38 +16,38 @@ public class FakeStoreProductService implements ProductService {
     public FakeStoreProductService(RestTemplate restTemplate){
         this.restTemplate = restTemplate;
     }
-    private Product convertFakeStoreProductDtoToProduct(FakeStoreProductDto fakeStoreProductDto){
+    private Product convertProductDtoToProduct(ProductDto productDto){
         Product product = new Product();
-        product.setId(fakeStoreProductDto.getId());
-        product.setTitle(fakeStoreProductDto.getTitle());
-        product.setPrice(fakeStoreProductDto.getPrice());
+        product.setId(productDto.getId());
+        product.setTitle(productDto.getTitle());
+        product.setPrice(productDto.getPrice());
 
         Category category = new Category();
-        category.setTitle(fakeStoreProductDto.getCategory());
+        category.setTitle(productDto.getCategory());
 
         product.setCategory(category);
-        product.setDescription(fakeStoreProductDto.getDescription());
-        product.setImage(fakeStoreProductDto.getImage());
+        product.setDescription(productDto.getDescription());
+        product.setImage(productDto.getImage());
 
         return product;
     }
     public Product getProductById(Long id){
         String fakeStoreURL = "https://fakestoreapi.com/products/" + id;
-        FakeStoreProductDto fakeStoreProductDto = restTemplate.getForObject(fakeStoreURL, FakeStoreProductDto.class);
+        ProductDto productDto = restTemplate.getForObject(fakeStoreURL, ProductDto.class);
 
-        if (fakeStoreProductDto == null) { return null; }
+        if (productDto == null) { return null; }
 
-        return convertFakeStoreProductDtoToProduct(fakeStoreProductDto);
+        return convertProductDtoToProduct(productDto);
     }
 
     @Override
     public List<Product> getAllProducts() {
         String fakeStoreURL = "https://fakestoreapi.com/products";
-        FakeStoreProductDto[] fakeStoreProductDtos = restTemplate.getForObject(fakeStoreURL, FakeStoreProductDto[].class);
+        ProductDto[] productDtos = restTemplate.getForObject(fakeStoreURL, ProductDto[].class);
 
         List<Product> productList = new ArrayList<>();
-        for(FakeStoreProductDto fakeStoreProductDto : fakeStoreProductDtos){
-            productList.add(convertFakeStoreProductDtoToProduct(fakeStoreProductDto));
+        for(ProductDto productDto : productDtos){
+            productList.add(convertProductDtoToProduct(productDto));
         }
 
         return productList;
