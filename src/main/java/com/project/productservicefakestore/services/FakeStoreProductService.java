@@ -49,6 +49,8 @@ public class FakeStoreProductService implements ProductService {
         String fakeStoreURL = "https://fakestoreapi.com/products";
         ProductDto[] productDtos = restTemplate.getForObject(fakeStoreURL, ProductDto[].class);
 
+        if (productDtos == null) throw new RuntimeException("No products available!");
+
         List<Product> productList = new ArrayList<>();
         for(ProductDto productDto : productDtos){
             productList.add(convertProductDtoToProduct(productDto));
@@ -64,6 +66,38 @@ public class FakeStoreProductService implements ProductService {
                 new HttpMessageConverterExtractor<>(ProductDto.class, restTemplate.getMessageConverters());
         ProductDto responseProductDto = restTemplate.execute("https://fakestoreapi.com/products/" + id,
                 HttpMethod.PUT, requestCallback, responseExtractor);
+
+        if (responseProductDto == null) return null;
+        return convertProductDtoToProduct(responseProductDto);
+    }
+
+    @Override
+    public Product createProduct(ProductDto productDto) {
+        ProductDto responseProductDto = restTemplate.postForObject("https://fakestoreapi.com/products",
+                productDto, ProductDto.class);
+        if (responseProductDto == null) throw new RuntimeException("Something went wrong. Please try again!");
+        return convertProductDtoToProduct(responseProductDto);
+    }
+
+    @Override
+    public Product updateProduct(Long id, ProductDto productDto) {
+        RequestCallback requestCallback = restTemplate.httpEntityCallback(productDto,ProductDto.class);
+        HttpMessageConverterExtractor<ProductDto> responseExtractor =
+                new HttpMessageConverterExtractor<>(ProductDto.class, restTemplate.getMessageConverters());
+        ProductDto responseProductDto = restTemplate.execute("https://fakestoreapi.com/products/" + id,
+                HttpMethod.PATCH, requestCallback, responseExtractor);
+
+        if (responseProductDto == null) return null;
+        return convertProductDtoToProduct(responseProductDto);
+    }
+
+    @Override
+    public Product deleteProduct(Long id) {
+        RequestCallback requestCallback = restTemplate.httpEntityCallback(null,ProductDto.class);
+        HttpMessageConverterExtractor<ProductDto> responseExtractor =
+                new HttpMessageConverterExtractor<>(ProductDto.class, restTemplate.getMessageConverters());
+        ProductDto responseProductDto = restTemplate.execute("https://fakestoreapi.com/products/" + id,
+                HttpMethod.DELETE, requestCallback, responseExtractor);
 
         if (responseProductDto == null) return null;
         return convertProductDtoToProduct(responseProductDto);
