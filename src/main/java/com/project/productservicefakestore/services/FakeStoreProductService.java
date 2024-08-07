@@ -41,6 +41,7 @@ public class FakeStoreProductService implements ProductService {
         if (productDto == null) { return null; }
 
         return convertProductDtoToProduct(productDto);
+//        throw new ArithmeticException("Something went wrong in the service!");
     }
 
     @Override
